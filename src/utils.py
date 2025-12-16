@@ -68,7 +68,7 @@ def clean_and_engineer_data():
 
 def generate_eda_plots(df: pd.DataFrame):
     """Generates and displays key EDA plots using Matplotlib/Seaborn in Streamlit."""
-    st.subheader("📊 Exploratory Data Analysis (EDA) Visualizations")
+    st.subheader(" Exploratory Data Analysis (EDA) Visualizations")
     sns.set_style("whitegrid")
     
     tab1, tab2, tab3, tab4 = st.tabs(["Price vs. Bedrooms", "City Price Distribution", "Build Area vs. Price", "Correlation Heatmap"])
