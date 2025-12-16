@@ -1,0 +1,17 @@
+# Core Data Handling and Analysis
+pandas
+numpy
+
+# Visualization
+matplotlib
+seaborn
+
+# Machine Learning (Core)
+scikit-learn
+
+# Advanced Models (Step 7)
+xgboost
+catboost
+
+# Application/Deployment (Steps 8 & 9)
+streamlit
