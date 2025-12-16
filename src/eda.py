@@ -20,11 +20,20 @@ def perform_eda(df: pd.DataFrame):
     print("\n1. Key Descriptive Statistics for Numerical Features:")
     print(df[['Price', 'Bedroom', 'Bathroom', 'Floors', 'Parking', 
               'House Age', 'Amenities Count', 'Build Area (Aana)']].describe().apply(lambda s: s.apply('{0:.2f}'.format)))
+    """ describe() gives:
+count
+mean (average)
+std (spread)
+min / max
+25%, 50%, 75% percentiles"""
     
-    # --- EDA Visualization Examples (For Report) ---
+    # --- EDA Visualization (Makes Graph) ---
     sns.set_style("whitegrid")
     
     # 2. Price vs Bedrooms (Example 1: Relationship Analysis)
+    # box plot shows how prices increases with number of bedrooms
+    # Shows typical price and Shows outliers (very expensive houses)
+    #box plot is good to see the distribution across different categories
     plt.figure(figsize=(10, 6))
     sns.boxplot(x='Bedroom', y='Price', data=df[df['Bedroom'] <= 10]) # Limit bedrooms for clarity
     plt.title('Price Distribution by Number of Bedrooms')
@@ -33,9 +42,10 @@ def perform_eda(df: pd.DataFrame):
     plt.yscale('log') # Use log scale due to high skewness in price
     plt.show()
 
-    # 3. Price vs Build Area (Example 2: Relationship Analysis)
+    # 3. Price vs Build Area (Relationship Analysis) ScatterPlot
+    #Does bigger house = more expensive?”
     plt.figure(figsize=(10, 6))
-    sns.scatterplot(x='Build Area (Aana)', y='Price', data=df[df['Build Area (Aana)'] < 50]) # Limit area for clarity
+    sns.scatterplot(x='Build Area (Aana)', y='Price', data=df[df['Build Area (Aana)'] < 50]) # Limit area for clarity so it removes extremely large houses
     plt.title('Price vs. Build Area (Aana)')
     plt.xlabel('Built-up Area (Aana)')
     plt.ylabel('Price')
@@ -43,6 +53,7 @@ def perform_eda(df: pd.DataFrame):
     plt.show()
 
     # 4. City-wise Price Distribution (Example 3: Categorical Analysis)
+    #ordered cities by median price so most expensive city appears first
     plt.figure(figsize=(12, 6))
     city_order = df.groupby('City')['Price'].median().sort_values(ascending=False).index
     sns.boxplot(x='City', y='Price', data=df, order=city_order)
@@ -54,7 +65,9 @@ def perform_eda(df: pd.DataFrame):
     plt.tight_layout()
     plt.show()
 
-    # 5. Amenities Count vs Price (Example 4: Feature Importance Justification)
+    # 5. Amenities Count vs Price (Feature Importance Justification) (VIOLIN PLOT)
+    #More amenities → higher price range
+    # Shows distribution shape, median, quartiles
     plt.figure(figsize=(10, 6))
     sns.violinplot(x='Amenities Count', y='Price', data=df[df['Amenities Count'] <= 20], inner='quartile', color='skyblue')
     plt.title('Price Distribution by Amenities Count')
@@ -64,6 +77,8 @@ def perform_eda(df: pd.DataFrame):
     plt.show()
 
     # 6. Correlation Heatmap (Justification for Model Input)
+    # Shows correlation between numerical features
+    # +1 is positive correlation, -1 is opposite correlation, 0 is no correlation
     numeric_cols = ['Price', 'Bedroom', 'Bathroom', 'Floors', 'Parking', 
                     'House Age', 'Amenities Count', 'Build Area (Aana)', 'Price per Bedroom']
     corr_matrix = df[numeric_cols].corr()
