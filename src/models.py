@@ -1,7 +1,7 @@
 # src/models.py
 import pandas as pd
 import numpy as np
-import joblib # Used for saving/loading models and data
+import joblib
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns 
@@ -15,14 +15,12 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 # --- Models ---
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import KNeighborsRegressor
-# Note: CatBoost and XGBoost have been removed due to severe dependency issues.
 
 # --- Configuration ---
 SEGMENTED_DATA_PATH = 'data/segmented_data.csv'
 MODEL_DIR = 'models/' 
 RESULTS_FILE = MODEL_DIR + 'model_performance_results.csv'
 BEST_MODEL_FILE = MODEL_DIR + 'best_model.joblib'
-PREPROCESSOR_FILE = MODEL_DIR + 'preprocessor.joblib'
 
 
 def evaluate_model(y_true, y_pred, model_name):
@@ -37,6 +35,7 @@ def evaluate_model(y_true, y_pred, model_name):
         'MAE': mae,
         'R2 Score': r2
     }
+
 
 def run_ml_pipeline():
     """Loads data, prepares features, trains models, and evaluates performance."""
@@ -72,12 +71,8 @@ def run_ml_pipeline():
         ],
         remainder='passthrough'
     )
-
-    joblib.dump(preprocessor, PREPROCESSOR_FILE)
-    print(f"Preprocessor saved to {PREPROCESSOR_FILE}")
     
-    # 4. Define Models and Pipelines (Only functional models remain)
-    
+    # 4. Define Models
     models = {
         "Random Forest Regressor": RandomForestRegressor(n_estimators=150, random_state=42, n_jobs=-1, max_depth=15),
         "KNN Regressor": KNeighborsRegressor(n_neighbors=5, n_jobs=-1),
@@ -90,16 +85,14 @@ def run_ml_pipeline():
 
     # 5. Train and Evaluate Models
     print("\n5. Training and Evaluating Models...")
-
     for name, model in models.items():
         print(f"\nTraining: {name}")
         
+        # Create pipeline with fitted preprocessor + model
         pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('regressor', model)])
-        
         pipeline.fit(X_train, y_train)
         
         y_pred = pipeline.predict(X_test)
-        
         metrics = evaluate_model(y_test, y_pred, name)
         results.append(metrics)
         print(f"  RMSE: {metrics['RMSE']:.2f}, R2: {metrics['R2 Score']:.4f}")
@@ -112,15 +105,14 @@ def run_ml_pipeline():
     # 6. Save Results and Best Model
     results_df = pd.DataFrame(results).sort_values(by='R2 Score', ascending=False)
     results_df.to_csv(RESULTS_FILE, index=False)
-    print(f"\n✅ All model results saved to {RESULTS_FILE}")
+    print(f"\nAll model results saved to {RESULTS_FILE}")
     
     joblib.dump(best_model, BEST_MODEL_FILE)
-    print(f"✅ Best Model ({best_model_name}) saved to {BEST_MODEL_FILE}")
+    print(f"Best Model ({best_model_name}) saved to {BEST_MODEL_FILE}")
     
-    # 7. Feature Importance (For Random Forest)
+    # 7. Feature Importance (for Random Forest)
     if best_model_name == "Random Forest Regressor":
         print("\n--- Feature Importance for Best Model (Random Forest) ---")
-        
         feature_names_out = (
             numerical_features + 
             list(preprocessor.named_transformers_['cat'].get_feature_names_out(categorical_features))
@@ -131,13 +123,13 @@ def run_ml_pipeline():
         top_10_features = feature_importance.sort_values(ascending=False).head(10)
         print(top_10_features)
         
-        # Display plot for documentation/report
         plt.figure(figsize=(10, 6))
         sns.barplot(x=top_10_features.values, y=top_10_features.index, color='skyblue')
         plt.title('Top 10 Feature Importances (Random Forest)')
         plt.xlabel('Importance Score')
         plt.tight_layout()
         plt.show()
+
 
 if __name__ == '__main__':
     if not os.path.exists(MODEL_DIR):
