@@ -25,7 +25,7 @@ page = st.sidebar.radio("Go to:", [
 
 # --- PHASE 1: Introduction & Setup ---
 if page == "1. Introduction & Setup":
-    st.title("House Price Prediction System (Final Year Project)")
+    st.title("House Price Prediction System")
     st.markdown("""
     This application demonstrates a complete machine learning pipeline, from raw data cleaning 
     to deployment of an **Intelligent Price Prediction Chatbot**.
