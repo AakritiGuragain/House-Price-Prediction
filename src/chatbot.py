@@ -80,7 +80,7 @@ def prepare_input_df(bhk, aana, city, face, bathrooms, cluster_map):
 def predict_price(input_df, pipeline):
     """Predict price using the fitted pipeline."""
     try:
-        prediction = pipeline.predict(input_df)[0]  # pipeline handles preprocessing
+        prediction = pipeline.predict(input_df)[0]  # pipeline handles data preprocessing
         return prediction, None
     except Exception as e:
         return None, str(e)
